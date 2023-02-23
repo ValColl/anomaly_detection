@@ -1,7 +1,7 @@
 anomaly_detection
 ==============================
 
-A short description of the project.
+A benchmark of different deep learning models on the MVTec dataset.
 
 Project Organization
 ------------
