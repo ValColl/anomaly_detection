@@ -1,7 +1,7 @@
 anomaly_detection
 ==============================
 
-A benchmark of different deep learning models on the MVTec dataset.
+A benchmark of different deep learning models on the MVTec_AD dataset.
 
 Project Organization
 ------------
