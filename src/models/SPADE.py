@@ -12,10 +12,8 @@ from torch.utils.data import DataLoader
 from PIL import Image
 from tqdm import tqdm
 from sklearn.neighbors import NearestNeighbors
-from sklearn.metrics import roc_auc_score
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import roc_curve
 from scipy.ndimage import gaussian_filter
 import matplotlib.pyplot as plt
 from collections import OrderedDict
@@ -27,7 +25,8 @@ import sys
 sys.path.append('../../')
 from src.data.MvTec import MVTecDataset
 
-
+# Impot the evaluation function
+from src.visualization.evaluation import evaluate_image_rocauc, evaluate_pixel_rocauc
 
 '''
 def parse_args():
@@ -137,9 +136,7 @@ def main(top_k, save_path = '../../models/SPADE/', class_names = ['bottle', 'woo
         scores = torch.mean(topk_values, 1).cpu().detach().numpy()
 
         # calculate image-level ROC AUC score
-        fpr, tpr, _ = roc_curve(gt_list, scores)
-        roc_auc = roc_auc_score(gt_list, scores)
-        total_roc_auc.append(roc_auc)
+        roc_auc, fpr, tpr = evaluate_image_rocauc(total_roc_auc, gt_list, scores)
         print('%s ROCAUC: %.3f' % (class_name, roc_auc))
         fig_img_rocauc.plot(fpr, tpr, label='%s ROCAUC: %.3f' % (class_name, roc_auc))
 
@@ -177,9 +174,7 @@ def main(top_k, save_path = '../../models/SPADE/', class_names = ['bottle', 'woo
         flatten_score_map_list = np.concatenate(score_map_list).ravel()
 
         # calculate per-pixel level ROCAUC
-        fpr, tpr, _ = roc_curve(flatten_gt_mask_list, flatten_score_map_list)
-        per_pixel_rocauc = roc_auc_score(flatten_gt_mask_list, flatten_score_map_list)
-        total_pixel_roc_auc.append(per_pixel_rocauc)
+        per_pixel_rocauc, fpr, tpr = evaluate_pixel_rocauc(total_pixel_roc_auc, flatten_gt_mask_list, flatten_score_map_list)
         print('%s pixel ROCAUC: %.3f' % (class_name, per_pixel_rocauc))
         fig_pixel_rocauc.plot(fpr, tpr, label='%s ROCAUC: %.3f' % (class_name, per_pixel_rocauc))
 
@@ -258,4 +253,4 @@ def denormalization(x):
     return x
 
 if __name__ == '__main__':
-    main(top_k = 5, save_path = '../../models/SPADE/', class_names = ['wood'])
+    main(top_k = 5, save_path = '../../models/SPADE/', class_names = ['bottle', 'wood', 'screw'])
