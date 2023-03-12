@@ -1,5 +1,14 @@
+# Import necessary libraries
+import os
+import torch
+import torchvision.transforms as T
+from torch.utils.data import Dataset
+from PIL import Image
+
+
+
 class MVTecDataset(Dataset):
-  def __init__(self, root_path='../data/raw/MVTec_AD', class_name='wood', is_train = True, resize=256, cropsize=224):
+  def __init__(self, root_path='../../data/processed/MVTec_AD', class_name='wood', is_train = True, resize=256, cropsize=224):
     self.root_path = root_path
     self.class_name = class_name
     self.is_train = is_train
