@@ -13,11 +13,11 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import precision_recall_curve
 from skimage import morphology, measure
 from scipy.ndimage import gaussian_filter
-from models.unet import UNet
-from utils.gen_mask import gen_mask
-from losses.gms_loss import MSGMS_Score
-from datasets.mvtec import MVTecDataset
-from utils.funcs import denormalization
+from riad_functions.models.unet import UNet
+from riad_functions.utils.gen_mask import gen_mask
+from riad_functions.losses.gms_loss import MSGMS_Score
+from riad_functions.mvtec import MVTecDataset
+from riad_functions.utils.funcs import denormalization
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
@@ -26,20 +26,21 @@ plt.switch_backend('agg')
 
 def main():
     parser = argparse.ArgumentParser(description='Testing')
-    parser.add_argument('--obj', type=str, default='bottle')
+    parser.add_argument('--obj', type=str, default='toothbrush')
     parser.add_argument('--data_type', type=str, default='mvtec')
-    parser.add_argument('--data_path', type=str, default='/home/ubuntu/perso/Reconstruction-by-inpainting-for-visual-anomaly-detection/datasets/mvtec_anomaly_detection')
+    parser.add_argument('--data_path', type=str, default='../../data/raw/mvtec_anomaly_detection')
     parser.add_argument('--checkpoint_dir',
                         type=str,
-                        default='./mvtec/bottle/seed_3338/bottle_2020-11-11-4859_model.pt')
+                        default='../../models/riad/toothbrush/seed_1182_batch_4_img_256_kvalue_0/toothbrush_2023-03-20-3956_model.pt')
     parser.add_argument("--grayscale", action='store_true', help='color or grayscale input image')
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--img_size', type=int, default=256)
-    parser.add_argument('--seed', type=int, default=3338)
+    parser.add_argument('--seed', type=int, default=1182)
     parser.add_argument('--ratio', type=float, default=95)
     parser.add_argument('--k_value', type=int, nargs='+', default=[2, 4, 8, 16])
+    parser.add_argument("--save_path", type=str, default='../../models/riad/')
     args = parser.parse_args()
-    args.save_dir = './' + args.data_type + '/' + args.obj + '/seed_{}/'.format(args.seed)
+    args.save_dir = args.save_path + 'results/' + args.obj + '/seed_{}/'.format(args.seed)
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
