@@ -1,0 +1,4 @@
+top_k, bottle_image_ROCAUC, bottle_pixel_ROCAUC, wood_image_ROCAUC, wood_pixel_ROCAUC, screw_image_ROCAUC, screw_pixel_ROCAUC, average_image_ROCAUC, average_pixel_ROCAUC
+2, 0.969, 0.562, 0.961, 0.644, 0.696, 0.583, 0.875, 0.596
+5, 0.972, 0.562, 0.958, 0.644, 0.667, 0.583, 0.866, 0.596
+10, 0.971, 0.562, 0.958, 0.644, 0.630, 0.583, 0.853, 0.596

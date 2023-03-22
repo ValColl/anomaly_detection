@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 from collections import OrderedDict
 import pickle
 
+import csv
+
 
 # Import the MVTec dataset class
 import sys
@@ -47,6 +49,9 @@ def main(top_k, save_path = '../../models/SPADE/', class_names = ['bottle', 'woo
     
     Returns:
         None"""
+    # Show a message to the user to inform them that the model is running
+    print('Running SPADE on the following classes: '+ str(class_names)+ ', with '+ str(top_k) + ' neighbors.')
+
     # device setup
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -158,6 +163,7 @@ def main(top_k, save_path = '../../models/SPADE/', class_names = ['bottle', 'woo
                 dist_matrix = torch.cat(dist_matrix_list, 0)
 
                 # k nearest features from the gallery (k=1)
+                # TODO : implement it with k > 1
                 score_map = torch.min(dist_matrix, dim=0)[0]
                 score_map = F.interpolate(score_map.unsqueeze(0).unsqueeze(0), size=224,
                                           mode='bilinear', align_corners=False)
@@ -198,6 +204,32 @@ def main(top_k, save_path = '../../models/SPADE/', class_names = ['bottle', 'woo
 
     fig.tight_layout()
     fig.savefig(os.path.join(save_path, 'roc_curve.png'), dpi=100)
+
+    #Create a csv file to save the image and pixel accuracies for each class, with the column names. If it exists append to it.
+    csv_path = os.path.join(save_path, 'results.csv')
+    write_needed = not(os.path.exists(csv_path))
+    # TODO : Make write_needed = True if the file exists but was written with another class_names
+    if write_needed: # If the csv file does not exist, create it
+        with open(csv_path, 'w') as f:
+        # Write the column names
+            # Add top_k
+            f.write('top_k')
+            # Add class names
+            for class_name in class_names:
+                f.write(', %s_image_ROCAUC, %s_pixel_ROCAUC' % (class_name, class_name))
+            # Add average ROCAUCs
+            f.write(', average_image_ROCAUC, average_pixel_ROCAUC')
+            f.write('\n')
+    with open(csv_path, 'a') as f:
+    # Write the results to the csv file
+        # Add top_k
+        f.write(str(top_k))
+        # Add ROCAUCs
+        for class_name in class_names:
+            f.write(', %.3f, %.3f' % (total_roc_auc[class_names.index(class_name)], total_pixel_roc_auc[class_names.index(class_name)]))
+        # Add average ROCAUCs
+        f.write(', %.3f, %.3f' % (np.mean(total_roc_auc), np.mean(total_pixel_roc_auc)))
+        f.write('\n')
 
 
 def calc_dist_matrix(x, y):
